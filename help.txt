@@ -1,0 +1,22 @@
+This has happened because you have a mixture of Ubuntu and Nvidia packages on your system. From the last line of your second log:
+
+kernel version 530.30.2 does not match DSO version 510.108.3 – cannot find working devices in this configuration 
+"510" is the latest Nvidia driver version supported on Ubuntu 22.04 which can work with CUDA. "530" is the Nvidia driver version you get when you use Nvidia's driver repository. You have parts of both drivers installed, and they are not compatible.
+
+Nvidia's repository is notorious for causing problems like this, so it is recommended to never use it. You will need to remove all Nvidia repository references and purge all the packages they installed. The easiest way to do this is usually to do a full re-installation of Ubuntu.
+
+After you have fully removed the Nvidia packages, re-install the nvidia-510 driver from "Additional Drivers" along with nvidia-cuda-toolkit and nvidia-cudnn apt packages from the official Ubuntu repositories.
+
+To get TensorRT working, download the tar installer (the first one in the list of downloads, called "TensorRT 8.6 EA for Linux x86_64 and CUDA 11.0, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7 and 11.8 TAR Package"), unpack it to /opt and then add it to your LD_LIBRARY_PATH, eg:
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/TensorRT-8.6.0.12/lib
+
+You don't need to install the tensorrt Python package at all. Tensorflow uses the C++ libraries directly. And anyway, the tensorrt package only works with CUDA 12, which is only available on Ubuntu 22.04 if you use Nvidia's repositories.
+
+If you run into a problem where cuDNN is too old, then you should again download the cuDNN TAR package unpack in /opt and add it to your LD_LIBRARY_PATH.
+
+If you run into a problem where Tensorflow cannot find libdevice, you need to set up a symlink:
+
+sudo mkdir -p /usr/local/cuda/nvvm
+sudo ln -s /usr/lib/nvidia-cuda-toolkit/libdevice/ /usr/local/cuda/nvvm/libdevice
+After performing these steps I was able to run Tensorflow on my RTX 2070S on Ubuntu 22.04. Unfortunately it now runs slower than the CPU version on my i7 6700. (This is probably because my model is very small.)
