@@ -6,6 +6,7 @@ So created a new virtual space for Python using the doumenetation. -> https://ww
 
     sudo apt install python3-venv
     python3 -m venv /home/robin/.venv/python-venv-huggingface/bin
+    source /home/robin/.venv/python-venv-huggingface/bin/activate
 
 I am using VScode to run the python code. So I have to set the interpreter to the new location of venv.
 Used the documenttaion -> https://code.visualstudio.com/docs/python/environments
